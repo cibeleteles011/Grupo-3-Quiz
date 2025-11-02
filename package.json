@@ -1,0 +1,15 @@
+{
+  "name": "grupo-3-quiz",
+  "version": "1.0.0",
+  "description": "Quiz multiplayer com salas por PIN (host e jogadores)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.7.2"
+  }
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Host - Quiz</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .panel{background:rgba(0,0,0,.8);padding:1rem;border-radius:12px;max-width:900px;width:95%;margin:1rem auto}
+    .row{display:flex;gap:1rem;flex-wrap:wrap}
+    input,select,button,textarea{padding:.6rem .8rem;border-radius:8px;border:1px solid #333}
+    .q-item{border:1px dashed #444;padding:.8rem;border-radius:8px;margin:.5rem 0}
+    .btn-small{padding:.4rem .8rem}
+    .muted{opacity:.8}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+    .answers input{width:100%}
+  </style>
+</head>
+<body>
+  <div class="screen">
+    <div class="panel">
+      <h1>Host - Criar Sala</h1>
+      <div class="row">
+        <button id="btnCreate" class="btn">Criar sala</button>
+        <div id="roomInfo" class="muted"></div>
+      </div>
+      <div class="row" style="align-items:center;gap:1.2rem;margin-top:.6rem">
+        <img id="qr" alt="QR Code" style="display:none;width:160px;height:160px;border-radius:12px;background:#fff;padding:6px" />
+        <button id="btnReveal" class="btn-small">Revelar</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Perguntas (cole ou escreva todas de uma vez)</h2>
+      <div class="q-item">
+        <textarea id="bulk" rows="10" style="width:100%" placeholder='Exemplo JSON:\n[
+  {"question":"Pergunta 1?","answers":["A","B","C","D"],"correct":0},
+  {"question":"Pergunta 2?","answers":["A","B","C","D"],"correct":2}
+]'></textarea>
+        <div class="row" style="margin-top:.5rem">
+          <button id="btnLoad" class="btn">Carregar perguntas</button>
+          <div class="muted">Carregadas: <span id="qCount">0</span></div>
+        </div>
+        <div id="qList" style="margin-top:.5rem"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Jogadores</h2>
+      <ul id="players"></ul>
+      <div class="row">
+        <button id="btnStart" class="btn">Iniciar Jogo</button>
+        <button id="btnNext" class="btn-small">Próxima questão</button>
+      </div>
+    </div>
+
+    <div class="panel" id="live">
+      <h2>Visualização ao vivo</h2>
+      <div id="liveHeader" class="muted"></div>
+      <div style="margin:.25rem 0 1rem" class="muted">Tempo: <span id="liveCountdown">--</span>s</div>
+      <h3 id="liveQuestion"></h3>
+      <div class="answers" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:.75rem">
+        <button class="answer-btn answer-red" id="lAns0" disabled></button>
+        <button class="answer-btn answer-blue" id="lAns1" disabled></button>
+        <button class="answer-btn answer-yellow" id="lAns2" disabled></button>
+        <button class="answer-btn answer-green" id="lAns3" disabled></button>
+      </div>
+      <div style="margin-top:1rem">
+        <div class="muted">Top 5 (ao vivo)</div>
+        <ul id="liveTop5" style="list-style:none;padding-left:0"></ul>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/public/host.js"></script>
+</body>
+</html>

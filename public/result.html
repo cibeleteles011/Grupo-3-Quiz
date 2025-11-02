@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resultado - Sala</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .panel{background:rgba(0,0,0,.85);padding:1.25rem;border-radius:14px;max-width:700px;width:95%;margin:2rem auto}
+    #top5{list-style:none;padding-left:0;margin-top:.75rem}
+    #top5 li{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;background:rgba(255,255,255,.06);border-radius:10px;margin:.3rem 0}
+    #top5 img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+    .score{display:inline-block;padding:.5rem 1rem;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15)}
+  </style>
+</head>
+<body>
+  <div class="screen">
+    <div class="panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem">
+        <h2 id="resTitle">Resultado</h2>
+        <div id="resScore" class="score">--</div>
+      </div>
+      <div class="muted" style="margin-top:.5rem">Top 5</div>
+      <ul id="top5"></ul>
+      <div class="muted" id="hint" style="margin-top:.75rem">Aguardando próxima pergunta...</div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/public/result.js"></script>
+</body>
+</html>

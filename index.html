@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Tela de Início -->
+    <div id="start-screen" class="screen">
+        <h1>Quiz Game</h1>
+        <div class="avatar-selection">
+            <h2>Escolha seu avatar</h2>
+            <div class="avatar-grid">
+                <img src="avatars/avatar1.png" class="avatar" data-avatar="1">
+                <img src="avatars/avatar2.png" class="avatar" data-avatar="2">
+                <img src="avatars/avatar3.png" class="avatar" data-avatar="3">
+                <img src="avatars/avatar4.png" class="avatar" data-avatar="4">
+            </div>
+            <input type="text" id="player-name" placeholder="Digite seu nome">
+            <button id="start-btn" class="btn">Começar</button>
+        </div>
+    </div>
+
+    <!-- Tela do Quiz -->
+    <div id="quiz-screen" class="screen hidden">
+        <div class="timer-container">
+            <div id="timer">30</div>
+        </div>
+        <div class="question-container">
+            <h2 id="question"></h2>
+            <div class="answers-grid">
+                <button class="answer-btn" data-color="red"></button>
+                <button class="answer-btn" data-color="blue"></button>
+                <button class="answer-btn" data-color="yellow"></button>
+                <button class="answer-btn" data-color="green"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Resultado -->
+    <div id="result-screen" class="screen hidden">
+        <div class="score-container">
+            <h2>Resultado da Rodada</h2>
+            <div id="round-score"></div>
+            <div id="current-podium"></div>
+        </div>
+    </div>
+
+    <!-- Tela Final -->
+    <div id="final-screen" class="screen hidden">
+        <h1>Pódio Final</h1>
+        <div class="podium">
+            <div class="podium-place" id="second">2º</div>
+            <div class="podium-place" id="first">1º</div>
+            <div class="podium-place" id="third">3º</div>
+        </div>
+        <button id="restart-btn" class="btn">Jogar Novamente</button>
+    </div>
+
+    <audio id="countdown-sound" src="sounds/countdown.mp3"></audio>
+    <audio id="correct-sound" src="sounds/correct.mp3"></audio>
+    <audio id="wrong-sound" src="sounds/wrong.mp3"></audio>
+
+    <script src="script.js"></script>
+</body>
+</html>

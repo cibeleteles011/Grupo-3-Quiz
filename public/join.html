@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrar na Sala - Quiz</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .panel{background:rgba(0,0,0,.8);padding:1rem;border-radius:12px;max-width:600px;width:95%;margin:1rem auto}
+    .row{display:flex;gap:1rem;flex-wrap:wrap}
+    input,button{padding:.6rem .8rem;border-radius:8px;border:1px solid #333}
+    .answers{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+    .answers button{padding:1rem}
+    .avatar-grid{display:grid;grid-template-columns:repeat(4,70px);gap:.75rem;margin:.75rem 0;justify-content:center}
+    .avatar-grid img{width:70px;height:70px;border-radius:50%;border:3px solid transparent;cursor:pointer;object-fit:cover;transition:.2s}
+    .avatar-grid img:hover{transform:scale(1.05)}
+    .avatar-grid img.selected{border-color:var(--gold)}
+    #result{display:none}
+    #result .top{display:flex;gap:1rem;align-items:center;justify-content:space-between}
+    #top5{list-style:none;padding-left:0;margin-top:.5rem}
+    #top5 li{display:flex;align-items:center;gap:.5rem;padding:.4rem .6rem;background:rgba(255,255,255,.06);border-radius:8px;margin:.25rem 0}
+    #top5 img{width:28px;height:28px;border-radius:50%;object-fit:cover}
+  </style>
+</head>
+<body>
+  <div class="screen">
+    <div class="panel">
+      <h1>Entrar na Sala</h1>
+      <div>
+        <div class="muted">Escolha um avatar</div>
+        <div class="avatar-grid" id="avatarGrid">
+          <img src="/avatars/avatar1.svg" alt="avatar1" data-avatar="avatars/avatar1.svg" />
+          <img src="/avatars/avatar2.svg" alt="avatar2" data-avatar="avatars/avatar2.svg" />
+          <img src="/avatars/avatar3.svg" alt="avatar3" data-avatar="avatars/avatar3.svg" />
+          <img src="/avatars/avatar4.svg" alt="avatar4" data-avatar="avatars/avatar4.svg" />
+        </div>
+      </div>
+      <div class="row">
+        <input id="pin" placeholder="PIN" />
+        <input id="name" placeholder="Seu nome" />
+        <button id="btnJoin" class="btn">Entrar</button>
+      </div>
+      <div id="status" class="muted"></div>
+    </div>
+
+    <div class="panel" id="game" style="display:none">
+      <div id="qHeader"></div>
+      <div class="muted" id="qTimer" style="margin-top:.25rem">Tempo: <span id="countdown">--</span>s</div>
+      <h2 id="qText"></h2>
+      <div class="answers">
+        <button id="ans0" class="answer-btn answer-red"></button>
+        <button id="ans1" class="answer-btn answer-blue"></button>
+        <button id="ans2" class="answer-btn answer-yellow"></button>
+        <button id="ans3" class="answer-btn answer-green"></button>
+      </div>
+    </div>
+
+    <div class="panel" id="result">
+      <div class="top">
+        <h2 id="resTitle">Resultado</h2>
+        <div id="resScore" class="btn"></div>
+      </div>
+      <div class="muted">Top 5</div>
+      <ul id="top5"></ul>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/public/player.js"></script>
+</body>
+</html>

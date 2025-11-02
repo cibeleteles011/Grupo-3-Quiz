@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz - Sala</title>
+  <link rel="stylesheet" href="/style.css" />
+  <style>
+    .panel{background:rgba(0,0,0,.8);padding:1rem;border-radius:12px;max-width:800px;width:95%;margin:1rem auto}
+    .row{display:flex;gap:1rem;flex-wrap:wrap}
+    .answers{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+  </style>
+</head>
+<body>
+  <div class="screen">
+    <div class="panel" id="game" style="display:none">
+      <div class="row" style="justify-content:space-between;width:100%">
+        <div id="qHeader"></div>
+        <div class="muted">Tempo: <span id="countdown">--</span>s</div>
+      </div>
+      <h2 id="qText"></h2>
+      <div class="answers">
+        <button id="ans0" class="answer-btn answer-red"></button>
+        <button id="ans1" class="answer-btn answer-blue"></button>
+        <button id="ans2" class="answer-btn answer-yellow"></button>
+        <button id="ans3" class="answer-btn answer-green"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/public/quiz.js"></script>
+</body>
+</html>
