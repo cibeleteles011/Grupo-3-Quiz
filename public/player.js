@@ -12,22 +12,56 @@ const params = new URLSearchParams(location.search);
 const pinFromUrl = params.get('pin');
 if (pinFromUrl) pinInput.value = pinFromUrl;
 
-// Seleção de avatar
+// Carregar avatares dinamicamente se disponíveis
 if (avatarGrid) {
-  avatarGrid.querySelectorAll('img').forEach(img => {
-    img.addEventListener('click', () => {
-      avatarGrid.querySelectorAll('img').forEach(i => i.classList.remove('selected'));
-      img.classList.add('selected');
-      selectedAvatar = img.getAttribute('data-avatar');
+  fetch('/api/avatars')
+    .then(r => r.json())
+    .then(data => {
+      if (data && data.ok && Array.isArray(data.avatars) && data.avatars.length) {
+        avatarGrid.innerHTML = '';
+        data.avatars.forEach(src => {
+          const img = document.createElement('img');
+          img.src = src;
+          img.alt = 'avatar';
+          img.setAttribute('data-avatar', src);
+          avatarGrid.appendChild(img);
+        });
+        // selecionar automaticamente o primeiro avatar
+        const first = avatarGrid.querySelector('img');
+        if (first) {
+          first.classList.add('selected');
+          selectedAvatar = first.getAttribute('data-avatar');
+        }
+      }
+      // ligar seleção (para avatares dinâmicos ou estáticos)
+      avatarGrid.querySelectorAll('img').forEach(img => {
+        img.addEventListener('click', () => {
+          avatarGrid.querySelectorAll('img').forEach(i => i.classList.remove('selected'));
+          img.classList.add('selected');
+          selectedAvatar = img.getAttribute('data-avatar');
+        });
+      });
+    })
+    .catch(() => {
+      // mantém os avatares estáticos caso a API falhe
+      avatarGrid.querySelectorAll('img').forEach(img => {
+        img.addEventListener('click', () => {
+          avatarGrid.querySelectorAll('img').forEach(i => i.classList.remove('selected'));
+          img.classList.add('selected');
+          selectedAvatar = img.getAttribute('data-avatar');
+        });
+      });
     });
-  });
 }
 
 btnJoin.onclick = () => {
   const pin = pinInput.value.trim();
   const name = nameInput.value.trim() || 'Jogador';
   if (!pin) { alert('Informe o PIN.'); return; }
-  socket.emit('player:join', { pin, name, avatar: selectedAvatar }, (resp) => {
+  // normaliza avatar para caminho absoluto
+  let avatar = selectedAvatar || (avatarGrid && avatarGrid.querySelector('img')?.getAttribute('data-avatar')) || '/avatars/avatar1.svg';
+  if (avatar && !avatar.startsWith('/')) avatar = '/' + avatar;
+  socket.emit('player:join', { pin, name, avatar }, (resp) => {
     if (!resp.ok) {
       statusEl.textContent = resp.error || 'Erro ao entrar.';
       return;

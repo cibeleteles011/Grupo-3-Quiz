@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const path = require('path');
 const { Server } = require('socket.io');
+const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
@@ -33,6 +34,20 @@ app.get('/result', (req, res) => {
 // Servir arquivos estáticos do diretório do projeto (para style.css e imagens) e da pasta public
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/avatars', express.static(path.join(__dirname, 'avatars')));
+
+// API para listar avatares disponíveis
+app.get('/api/avatars', (req, res) => {
+  const dir = path.join(__dirname, 'avatars');
+  fs.readdir(dir, (err, files) => {
+    if (err) return res.json({ ok: true, avatars: [] });
+    const allowed = new Set(['.png', '.jpg', '.jpeg', '.svg', '.webp']);
+    const list = files
+      .filter(f => allowed.has(path.extname(f).toLowerCase()))
+      .map(f => `/avatars/${f}`);
+    res.json({ ok: true, avatars: list });
+  });
+});
 
 function genPin() {
   return Math.floor(100000 + Math.random() * 900000).toString(); // 6 dígitos

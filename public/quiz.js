@@ -12,6 +12,7 @@ const gameEl = document.getElementById('game');
 const countdownEl = document.getElementById('countdown');
 let countdownInterval = null;
 let answeredThisQuestion = false;
+let selectedIndex = null;
 
 if (!pin || !key) {
   // sem contexto, volta para join
@@ -51,13 +52,27 @@ socket.emit('player:resume', { pin, key }, (resp) => {
 socket.on('game:question', ({ index, total, question, answers, startAt, duration }) => {
   gameEl.style.display = 'block';
   answeredThisQuestion = false;
+  selectedIndex = null;
   qHeader.textContent = `Pergunta ${index+1}/${total}`;
   qText.textContent = question;
+  // limpar estados visuais anteriores
+  ansBtns.forEach(b => {
+    b.classList.remove('selected', 'waiting');
+  });
   answers.forEach((txt, i) => {
     ansBtns[i].textContent = txt;
     ansBtns[i].onclick = () => {
       if (answeredThisQuestion) return;
       answeredThisQuestion = true;
+      selectedIndex = i;
+      // aplicar destaque visual na resposta escolhida e estado de espera nas demais
+      ansBtns.forEach((b, idx) => {
+        if (idx === i) {
+          b.classList.add('selected');
+        } else {
+          b.classList.add('waiting');
+        }
+      });
       socket.emit('player:answer', { pin, answerIndex: i }, (ack) => {
         // aguarda revelação do host ou todos responderem
         ansBtns.forEach(b => b.disabled = true);

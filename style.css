@@ -189,6 +189,18 @@ body::before {
 
 .answer-btn:active { transform: scale(0.98); }
 
+/* Destaque de seleção do jogador */
+.answer-btn.selected {
+    outline: 4px solid rgba(255, 255, 255, 0.65);
+    box-shadow: 0 0 0 4px rgba(255,255,255,0.2), 0 10px 30px rgba(0,0,0,0.35);
+    filter: brightness(1.05);
+}
+
+.answer-btn.waiting {
+    opacity: 0.85;
+    cursor: not-allowed;
+}
+
 /* Painel de resultado do multiplayer */
 #result .btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.15); }
 #result h2 { animation: pulse 1.2s ease infinite; }
