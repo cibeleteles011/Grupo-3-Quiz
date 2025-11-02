@@ -8,9 +8,11 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 
 app.use(express.json());
-// Servir arquivos estáticos do diretório do projeto (para style.css existente) e da pasta public
-app.use(express.static(__dirname));
-app.use(express.static(path.join(__dirname, 'public')));
+
+// Redireciona raiz antes de qualquer middleware estático
+app.get('/', (req, res) => {
+  res.redirect('/host');
+});
 
 app.get('/host', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'host.html'));
@@ -27,6 +29,10 @@ app.get('/quiz', (req, res) => {
 app.get('/result', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'result.html'));
 });
+
+// Servir arquivos estáticos do diretório do projeto (para style.css e imagens) e da pasta public
+app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
 
 function genPin() {
   return Math.floor(100000 + Math.random() * 900000).toString(); // 6 dígitos
