@@ -36,7 +36,8 @@ function renderResult({ correct, delta, total, top5 }) {
   (top5 || []).forEach((p, idx) => {
     const li = document.createElement('li');
     const img = document.createElement('img');
-    img.src = p.avatar || '/avatars/avatar1.svg';
+    img.src = p.avatar || '/avatars/Avatar 1.png';
+    img.onerror = () => { img.remove(); };
     const span = document.createElement('span');
     span.textContent = `${idx+1}. ${p.name} - ${p.score}`;
     li.appendChild(img);

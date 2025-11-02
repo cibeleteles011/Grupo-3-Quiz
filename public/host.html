@@ -33,16 +33,23 @@
     <div class="panel">
       <h2>Perguntas (cole ou escreva todas de uma vez)</h2>
       <div class="q-item">
-        <textarea id="bulk" rows="10" style="width:100%" placeholder='Exemplo JSON:\n[
+        <textarea id="bulk" rows="10" style="width:100%" placeholder='Exemplo JSON:
+[
   {"question":"Pergunta 1?","answers":["A","B","C","D"],"correct":0},
   {"question":"Pergunta 2?","answers":["A","B","C","D"],"correct":2}
 ]'></textarea>
         <div class="row" style="margin-top:.5rem">
           <button id="btnLoad" class="btn">Carregar perguntas</button>
-          <div class="muted">Carregadas: <span id="qCount">0</span></div>
+          <div class="muted">Total: <span id="qCount">0</span></div>
         </div>
-        <div id="qList" style="margin-top:.5rem"></div>
+        <div class="row" style="margin-top:.5rem;align-items:center">
+          <input type="file" id="fileQuestions" accept=".json,application/json" />
+          <button id="btnUpload" class="btn-small">Enviar arquivo</button>
+        </div>
+        <div id="qStatus" class="muted" style="margin-top:.25rem"></div>
+        <div id="qErrors" style="margin-top:.5rem;color:#ffb3b3;font-size:.95rem;white-space:pre-wrap"></div>
       </div>
+      <div id="qList" style="margin-top:.5rem"></div>
     </div>
 
     <div class="panel">

@@ -6,9 +6,9 @@ const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: '*' } });
+const io = new Server(server, { cors: { origin: '*' }, maxHttpBufferSize: 10 * 1024 * 1024 });
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // Redireciona raiz antes de qualquer middleware estático
 app.get('/', (req, res) => {
@@ -47,6 +47,18 @@ app.get('/api/avatars', (req, res) => {
       .map(f => `/avatars/${f}`);
     res.json({ ok: true, avatars: list });
   });
+});
+
+// Importação em massa de perguntas via HTTP
+app.post('/api/questions', (req, res) => {
+  const { pin, questions } = req.body || {};
+  const room = roomByPin(String(pin || ''));
+  if (!room) return res.status(400).json({ ok: false, error: 'PIN inválido' });
+  if (!Array.isArray(questions)) return res.status(400).json({ ok: false, error: 'questions deve ser um array' });
+  const valids = questions.filter(q => q && q.question && Array.isArray(q.answers) && q.answers.length === 4 && Number.isInteger(q.correct) && q.correct >=0 && q.correct <=3);
+  room.questions = valids;
+  io.to(pin).emit('lobby:questionsUpdated', { count: room.questions.length });
+  return res.json({ ok: true, count: valids.length });
 });
 
 function genPin() {
@@ -128,6 +140,20 @@ io.on('connection', (socket) => {
     room.keys.set(key, socket.id);
     socket.join(pin);
     ack && ack({ ok: true, name: player.name, score: player.score });
+    // se o jogo já estiver em andamento, envia a pergunta atual para este jogador
+    if (room.state === 'running' && room.currentIndex >= 0) {
+      const q = room.questions[room.currentIndex];
+      if (q) {
+        socket.emit('game:question', {
+          index: room.currentIndex,
+          total: room.questions.length,
+          question: q.question,
+          answers: q.answers,
+          startAt: room.startAt,
+          duration: room.duration
+        });
+      }
+    }
   });
 
   // Fornece último resultado para a página de resultados
@@ -172,6 +198,8 @@ io.on('connection', (socket) => {
     room.answers = room.answers || new Map();
     room.answers.set(socket.id, { answerIndex: Number(answerIndex), time: Date.now() });
     room.answered.add(socket.id);
+    // atualizar progresso para o host
+    io.to(room.hostId).emit('game:progress', { answered: room.answered.size, total: room.players.size });
     ack && ack({ ok: true });
     // Se todos jogadores responderam, revela automaticamente
     if (room.players.size > 0 && room.answered.size >= room.players.size) {
@@ -224,14 +252,21 @@ io.on('connection', (socket) => {
         revealAndScore(pin);
       }
     }, (room.duration || 30) * 1000);
-    io.to(pin).emit('game:question', {
+    const payload = {
       index: room.currentIndex,
       total: room.questions.length,
       question: q.question,
       answers: q.answers,
       startAt: room.startAt,
       duration: room.duration
-    });
+    };
+    io.to(pin).emit('game:question', payload);
+    // reenvio após pequeno atraso para pegar clientes que mudaram de página
+    setTimeout(() => {
+      io.to(pin).emit('game:question', payload);
+    }, 200);
+    // envia progresso inicial (0/n)
+    io.to(room.hostId).emit('game:progress', { answered: 0, total: room.players.size });
   }
 
   function revealAndScore(pin) {

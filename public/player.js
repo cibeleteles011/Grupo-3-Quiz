@@ -19,11 +19,13 @@ if (avatarGrid) {
     .then(data => {
       if (data && data.ok && Array.isArray(data.avatars) && data.avatars.length) {
         avatarGrid.innerHTML = '';
-        data.avatars.forEach(src => {
+        const list = [...data.avatars].sort((a,b)=>a.localeCompare(b));
+        list.forEach(src => {
           const img = document.createElement('img');
-          img.src = src;
+          img.src = src + '?v=' + Date.now();
           img.alt = 'avatar';
           img.setAttribute('data-avatar', src);
+          img.onerror = () => { img.remove(); };
           avatarGrid.appendChild(img);
         });
         // selecionar automaticamente o primeiro avatar
