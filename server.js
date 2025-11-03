@@ -303,7 +303,7 @@ io.on('connection', (socket) => {
           .map(p => ({ name: p.name, score: p.score, avatar: p.avatar }))
           .sort((a,b)=>b.score-a.score)
           .slice(0,5);
-        const payload = { correct, delta, total: player.score, top5: leaderboard };
+        const payload = { correct, delta, total: player.score, top5: leaderboard, questionIndex: room.currentIndex };
         player.lastResult = payload;
         io.to(socketId).emit('player:result', payload);
       } else {
@@ -312,7 +312,7 @@ io.on('connection', (socket) => {
           .map(p => ({ name: p.name, score: p.score, avatar: p.avatar }))
           .sort((a,b)=>b.score-a.score)
           .slice(0,5);
-        const payload = { correct: false, delta: 0, total: player.score, top5: leaderboard };
+        const payload = { correct: false, delta: 0, total: player.score, top5: leaderboard, questionIndex: room.currentIndex };
         player.lastResult = payload;
         io.to(socketId).emit('player:result', payload);
       }
