@@ -45,13 +45,21 @@ function renderResult({ correct, delta, total, top5 }) {
     const pos = document.createElement('span');
     pos.className = 'pos';
     pos.textContent = `${idx+1}.`;
-    const img = document.createElement('img');
-    img.src = p.avatar || '/avatars/Avatar 1.png';
-    img.onerror = () => { img.remove(); };
+    let avatarEl;
+    if (p.avatar && typeof p.avatar === 'string' && p.avatar.startsWith('emoji:')) {
+      avatarEl = document.createElement('div');
+      avatarEl.className = 'avatar-emoji';
+      avatarEl.textContent = p.avatar.slice(6);
+    } else {
+      const img = document.createElement('img');
+      img.src = p.avatar || '/avatars/Avatar 1.png';
+      img.onerror = () => { img.remove(); };
+      avatarEl = img;
+    }
     const span = document.createElement('span');
     span.textContent = `${idx+1}. ${p.name} - ${p.score}`;
     li.appendChild(pos);
-    li.appendChild(img);
+    li.appendChild(avatarEl);
     li.appendChild(span);
     top5El.appendChild(li);
   });
