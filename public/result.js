@@ -8,6 +8,8 @@ const resTitle = document.getElementById('resTitle');
 const resScore = document.getElementById('resScore');
 const top5El = document.getElementById('top5');
 const hintEl = document.getElementById('hint');
+let resultShownAt = 0;
+const MIN_RESULT_MS = 3000; // mínimo de 3s na tela de resultado
 
 if (!pin || !key) {
   location.href = '/join';
@@ -44,6 +46,7 @@ function renderResult({ correct, delta, total, top5 }) {
     li.appendChild(span);
     top5El.appendChild(li);
   });
+  resultShownAt = Date.now();
 }
 
 // Se o host revelar enquanto estamos nesta página, também recebemos resultado
@@ -52,10 +55,19 @@ socket.on('player:result', (payload) => {
 });
 
 // Quando a próxima pergunta for enviada, voltar para a tela do quiz
-socket.on('game:question', () => {
-  sessionStorage.setItem('pin', pin);
-  sessionStorage.setItem('key', key);
-  location.href = `/quiz?pin=${encodeURIComponent(pin)}&key=${encodeURIComponent(key)}`;
+socket.on('game:question', (payload) => {
+  // Não voltar se for uma pergunta antiga
+  if (payload && payload.startAt && resultShownAt && payload.startAt < resultShownAt) {
+    return;
+  }
+  const now = Date.now();
+  const wait = Math.max(0, MIN_RESULT_MS - (now - resultShownAt));
+  const go = () => {
+    sessionStorage.setItem('pin', pin);
+    sessionStorage.setItem('key', key);
+    location.href = `/quiz?pin=${encodeURIComponent(pin)}&key=${encodeURIComponent(key)}`;
+  };
+  if (wait > 0) setTimeout(go, wait); else go();
 });
 
 socket.on('game:finished', ({ leaderboard }) => {

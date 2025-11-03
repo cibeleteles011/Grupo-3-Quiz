@@ -94,7 +94,8 @@ io.on('connection', (socket) => {
       keys: new Map(),
       questions: [],
       currentIndex: -1,
-      state: 'lobby'
+      state: 'lobby',
+      revealing: false
     });
     socket.join(pin);
     socket.emit('host:roomCreated', { pin, joinUrl: `/join?pin=${pin}` });
@@ -140,8 +141,8 @@ io.on('connection', (socket) => {
     room.keys.set(key, socket.id);
     socket.join(pin);
     ack && ack({ ok: true, name: player.name, score: player.score });
-    // se o jogo já estiver em andamento, envia a pergunta atual para este jogador
-    if (room.state === 'running' && room.currentIndex >= 0) {
+    // se o jogo já estiver em andamento e não estiver em revelação, envia a pergunta atual
+    if (room.state === 'running' && room.currentIndex >= 0 && !room.revealing) {
       const q = room.questions[room.currentIndex];
       if (q) {
         socket.emit('game:question', {
@@ -199,12 +200,16 @@ io.on('connection', (socket) => {
     room.answers.set(socket.id, { answerIndex: Number(answerIndex), time: Date.now() });
     room.answered.add(socket.id);
     // atualizar progresso para o host
-    io.to(room.hostId).emit('game:progress', { answered: room.answered.size, total: room.players.size });
+    // calcular jogadores ativos conectados (exclui host e fantasmas)
+    const roomSet = io.sockets.adapter.rooms.get(pin) || new Set();
+    const active = new Set(
+      Array.from(roomSet).filter(id => id !== room.hostId && room.players.has(id))
+    );
+    io.to(room.hostId).emit('game:progress', { answered: Array.from(active).filter(id => room.answered.has(id)).length, total: active.size });
     ack && ack({ ok: true });
     // Se todos jogadores responderam, revela automaticamente
-    if (room.players.size > 0 && room.answered.size >= room.players.size) {
-      revealAndScore(pin);
-    }
+    const allAnswered = Array.from(active).every(id => room.answered.has(id));
+    if (active.size > 0 && allAnswered) revealAndScore(pin);
   });
 
   // Host avança questão
@@ -243,6 +248,7 @@ io.on('connection', (socket) => {
     room.startAt = Date.now();
     room.answered = new Set();
     room.answers = new Map();
+    room.revealing = false;
     if (room.questionTimer) { clearTimeout(room.questionTimer); }
     room.questionTimer = setTimeout(() => {
       // tempo esgotado -> host pode avançar
@@ -261,17 +267,24 @@ io.on('connection', (socket) => {
       duration: room.duration
     };
     io.to(pin).emit('game:question', payload);
-    // reenvio após pequeno atraso para pegar clientes que mudaram de página
+    // reenvio após pequeno atraso apenas se não estiver em revelação
     setTimeout(() => {
-      io.to(pin).emit('game:question', payload);
+      const r = roomByPin(pin);
+      if (r && r.state === 'running' && !r.revealing && r.currentIndex === payload.index) {
+        io.to(pin).emit('game:question', payload);
+      }
     }, 200);
-    // envia progresso inicial (0/n)
-    io.to(room.hostId).emit('game:progress', { answered: 0, total: room.players.size });
+    // envia progresso inicial (0/n) considerando ativos
+    const roomSet = io.sockets.adapter.rooms.get(pin) || new Set();
+    const active = new Set(Array.from(roomSet).filter(id => id !== room.hostId && room.players.has(id)));
+    io.to(room.hostId).emit('game:progress', { answered: 0, total: active.size });
   }
 
   function revealAndScore(pin) {
     const room = roomByPin(pin);
     if (!room || room.state !== 'running') return;
+    room.revealing = true;
+    if (room.questionTimer) { clearTimeout(room.questionTimer); room.questionTimer = null; }
     const q = room.questions[room.currentIndex];
     const duration = room.duration || 30;
     const startAt = room.startAt || Date.now();

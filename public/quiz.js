@@ -90,6 +90,14 @@ socket.on('player:result', (payload) => {
   location.href = `/result?pin=${encodeURIComponent(pin)}&key=${encodeURIComponent(key)}`;
 });
 
+// Fallback: se por algum motivo o evento individual não chegar, quando o host revelar
+// forçamos a navegação para a tela de resultado. Lá o cliente busca o último resultado.
+socket.on('reveal:shown', () => {
+  sessionStorage.setItem('pin', pin);
+  sessionStorage.setItem('key', key);
+  location.href = `/result?pin=${encodeURIComponent(pin)}&key=${encodeURIComponent(key)}`;
+});
+
 socket.on('room:closed', () => {
   alert('Sala encerrada.');
   location.href = '/join';
