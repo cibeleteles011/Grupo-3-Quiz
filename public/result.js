@@ -8,6 +8,7 @@ const resTitle = document.getElementById('resTitle');
 const resScore = document.getElementById('resScore');
 const top5El = document.getElementById('top5');
 const hintEl = document.getElementById('hint');
+const statusBox = document.getElementById('statusBox');
 let resultShownAt = 0;
 const MIN_RESULT_MS = 3000; // mínimo de 3s na tela de resultado
 
@@ -34,14 +35,22 @@ socket.emit('player:resume', { pin, key }, (resp) => {
 function renderResult({ correct, delta, total, top5 }) {
   resTitle.textContent = correct ? 'Acertou!' : 'Errou';
   resScore.textContent = `+${delta} (Total: ${total})`;
+  if (statusBox) {
+    statusBox.classList.remove('good', 'bad');
+    statusBox.classList.add(correct ? 'good' : 'bad');
+  }
   top5El.innerHTML = '';
   (top5 || []).forEach((p, idx) => {
     const li = document.createElement('li');
+    const pos = document.createElement('span');
+    pos.className = 'pos';
+    pos.textContent = `${idx+1}.`;
     const img = document.createElement('img');
     img.src = p.avatar || '/avatars/Avatar 1.png';
     img.onerror = () => { img.remove(); };
     const span = document.createElement('span');
     span.textContent = `${idx+1}. ${p.name} - ${p.score}`;
+    li.appendChild(pos);
     li.appendChild(img);
     li.appendChild(span);
     top5El.appendChild(li);

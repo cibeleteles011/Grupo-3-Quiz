@@ -6,22 +6,36 @@
   <title>Resultado - Sala</title>
   <link rel="stylesheet" href="/style.css" />
   <style>
-    .panel{background:rgba(0,0,0,.85);padding:1.25rem;border-radius:14px;max-width:700px;width:95%;margin:2rem auto}
-    #top5{list-style:none;padding-left:0;margin-top:.75rem}
-    #top5 li{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;background:rgba(255,255,255,.06);border-radius:10px;margin:.3rem 0}
-    #top5 img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+    .panel{background:rgba(0,0,0,.85);padding:1.5rem;border-radius:16px;max-width:780px;width:95%;margin:2rem auto}
+    .status{
+      display:flex;align-items:center;justify-content:space-between;gap:1rem;
+      padding:1rem;border-radius:12px;
+      background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)
+    }
+    .status.good{border-color:rgba(46,204,113,.45);background:rgba(46,204,113,.12)}
+    .status.bad{border-color:rgba(231,76,60,.45);background:rgba(231,76,60,.12)}
+    .title{font-size:1.5rem;font-weight:800}
     .score{display:inline-block;padding:.5rem 1rem;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15)}
+    .section{margin-top:1rem}
+    #top5{list-style:none;padding-left:0;margin-top:.5rem}
+    #top5 li{display:flex;align-items:center;gap:.75rem;padding:.6rem .8rem;background:rgba(255,255,255,.06);border-radius:10px;margin:.35rem 0}
+    #top5 img{width:40px;height:40px;border-radius:50%;object-fit:cover}
+    .pos{width:28px;display:inline-block;text-align:center;font-weight:700;opacity:.9}
   </style>
 </head>
 <body>
   <div class="screen">
     <div class="panel">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem">
-        <h2 id="resTitle">Resultado</h2>
+      <div id="statusBox" class="status">
+        <div class="title" id="resTitle">Resultado</div>
         <div id="resScore" class="score">--</div>
       </div>
-      <div class="muted" style="margin-top:.5rem">Top 5</div>
-      <ul id="top5"></ul>
+
+      <div class="section">
+        <div class="muted">Top 5</div>
+        <ul id="top5"></ul>
+      </div>
+
       <div class="muted" id="hint" style="margin-top:.75rem">Aguardando próxima pergunta...</div>
     </div>
   </div>
