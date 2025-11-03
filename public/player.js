@@ -43,25 +43,6 @@ if (avatarGrid) {
     selectedAvatar = first.getAttribute('data-avatar');
   }
   bindSelection();
-
-  // Depois tenta carregar imagens do servidor
-  fetch('/api/avatars')
-    .then(r => r.json())
-    .then(data => {
-      if (data && data.ok && Array.isArray(data.avatars) && data.avatars.length) {
-        const list = [...data.avatars].sort((a,b)=>a.localeCompare(b));
-        list.forEach(src => {
-          const img = document.createElement('img');
-          img.src = src + '?v=' + Date.now();
-          img.alt = 'avatar';
-          img.setAttribute('data-avatar', src);
-          img.onerror = () => { img.remove(); };
-          avatarGrid.appendChild(img);
-        });
-        bindSelection();
-      }
-    })
-    .catch(() => {});
 }
 
 btnJoin.onclick = () => {
